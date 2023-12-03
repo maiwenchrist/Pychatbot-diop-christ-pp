@@ -84,7 +84,6 @@ def calculate_idf(directory):
 def calculate_tf_idf(directory):
     word_idf = calculate_idf(directory)
     unique_words = list(word_idf.keys())
-    num_docs = len(os.listdir(directory))
 
     tfidf_matrix = []
 
@@ -106,7 +105,7 @@ def calculate_tf_idf(directory):
     return tfidf_matrix
 
 
-def non_important_words(tfidf_matrix, unique_words):
+"""def non_important_words(tfidf_matrix, unique_words):
     non_important = []
     for i, word in enumerate(unique_words):
         word_tfidf = [doc[i] for doc in tfidf_matrix]
@@ -115,10 +114,23 @@ def non_important_words(tfidf_matrix, unique_words):
     return non_important
 
 
+def highest_tfidf_words(corpus_directory):
+
+    tf_idf_matrix = calculate_tf_idf(corpus_directory)
+
+    mots_moins_importants = []
+    for i, doc in enumerate(tf_idf_matrix):
+        if all(score == 0 for score in doc):
+            mots_moins_importants.append(i)
+
+    return mots_moins_importants
+
+
+
 def display_non_important_words(tfidf_matrix, unique_words):
     non_important = non_important_words(tfidf_matrix, unique_words)
     if non_important:
         print("Mots non importants (avec un score TF-IDF de 0 dans tous les fichiers):")
         print(", ".join(non_important))
     else:
-        print("Aucun mot non important trouvé.")
+        print("Aucun mot non important trouvé.")"""
