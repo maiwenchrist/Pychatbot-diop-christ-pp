@@ -225,4 +225,97 @@ def words_environment(corpus_directory):
             }
     return None
 
-# PARTIE 2 dans functions2
+# PART 2
+
+
+def tokenize_question(question):
+    # Convertir en minuscules
+    question = question.lower()
+    # Supprimer la ponctuation
+    question = question.translate(str.maketrans('', '', string.punctuation))
+    # Diviser en mots
+    tokens = question.split()
+    return tokens
+
+
+def find_terms_in_corpus(question_tokens, idf_scores):
+    terms_in_corpus = [token for token in question_tokens if token in idf_scores]
+    return terms_in_corpus
+
+
+
+def calculate_question_tf_idf(question_tokens, unique_words, idf_scores):
+    # Initialiser le vecteur TF-IDF de la question avec des zéros
+    question_tf_idf = [0] * len(unique_words)
+
+    # Calculer la fréquence des mots dans la question
+    # convertir les tokens en une seule chaine
+    word_freq = counter(" ".join(question_tokens))
+
+    # Calculer le vecteur TF-IDF pour la question
+    for i, word in enumerate(unique_words):
+        if word in word_freq:
+            # TF * IDF
+            question_tf_idf[i] = word_freq[word] * idf_scores.get(word, 0)
+
+    return question_tf_idf
+
+# fourth function SIMILARITE DE COSINUS
+def dot_product(vector1, vector2):
+    return sum(a * b for a, b in zip(vector1, vector2))
+
+
+def vector_norm(vector):
+    return math.sqrt(sum(a**2 for a in vector))
+
+
+def cosinus_similarity(vector1, vector2):
+    dot_prod = dot_product(vector1, vector2)
+    norm1 = vector_norm(vector1)
+    norm2 = vector_norm(vector2)
+
+    if norm1 != 0 and norm2 != 0:
+        return dot_prod / (norm1 * norm2)
+    else:
+        return 0  # Retourne 0 pour éviter une division par zéro
+
+
+def most_relevant_document(tfidf_matrix, question_vector):
+    highest_similarity = 0
+    most_relevant_doc_index = -1
+
+    for index, doc_vector in enumerate(tfidf_matrix):
+        similarity = cosinus_similarity(question_vector, doc_vector)
+        if similarity > highest_similarity:
+            highest_similarity = similarity
+            most_relevant_doc_index = index
+
+    return most_relevant_doc_index
+
+
+# 6e fonctions
+def highest_tf_idf_word(question_tf_idf, unique_words):
+    highest_score_index = question_tf_idf.index(max(question_tf_idf))
+    return unique_words[highest_score_index]
+
+
+def find_sentence_with_word(text, word):
+    sentences = [sentence.strip() + '.' for sentence in text.split('.') if word in sentence]
+    return sentences[0] if sentences else ""
+
+
+# 7e fonctions
+def refine_response(question, answer):
+    # Liste de propositions non exhaustives
+    question_starters = {
+        "Comment": "Après analyse, ",
+        "Pourquoi": "Car, ",
+        "Peux-tu": "Oui, bien sûr! ",
+    }
+    # Trouver le début de la question et sélectionner la réponse appropriée
+    for starter, response_starter in question_starters.items():
+        if question.startswith(starter):
+            return response_starter + answer[0].upper() + answer[1:]
+
+    # Si aucune correspondance n'est trouvée, retourner la réponse originale
+    return answer[0].upper() + answer[1:]
